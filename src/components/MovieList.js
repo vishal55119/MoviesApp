@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react'
 
 import { movies } from '../movieData'
@@ -21,8 +22,13 @@ export class MovieList extends Component {
     }
 
     async componentDidMount() {
+        let savedDataOfFavourites = JSON.parse(localStorage.getItem('movies-app') || "[]");
+        let temp = savedDataOfFavourites.map((movie) => movie.id);
+        this.setState({
+            favourites: [...temp]
+        })
         const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=ca1dbe16ea3f77b729d89815448262e6&language=en-US&page=${this.state.currPage}`)
-        let movieData = response.data 
+        let movieData = response.data
         console.log(movieData)
 
         this.setState({
@@ -32,7 +38,7 @@ export class MovieList extends Component {
         console.log('componentDidMounting Done third')
     }
 
-    changeMovies = async() => {
+    changeMovies = async () => {
         const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=ca1dbe16ea3f77b729d89815448262e6&language=en-US&page=${this.state.currPage}`)
         let movieData = response.data
         console.log(movieData)
@@ -47,7 +53,7 @@ export class MovieList extends Component {
     handleNext = () => {
         let tempArr = []
 
-        for (let i = 1; i <= this.state.parr.length + 1; i++){
+        for (let i = 1; i <= this.state.parr.length + 1; i++) {
             tempArr.push(i)
         }
 
@@ -56,15 +62,15 @@ export class MovieList extends Component {
         this.setState({
             parr: [...tempArr],
             currPage: this.state.currPage + 1,
-        },this.changeMovies)
+        }, this.changeMovies)
     }
 
     handlePrevious = () => {
         if (this.state.currPage != 1) {
             this.setState({
                 currPage: this.state.currPage - 1
-            },this.changeMovies)
-            
+            }, this.changeMovies)
+
         }
     }
 
@@ -72,7 +78,7 @@ export class MovieList extends Component {
         if (this.state.currPage != value) {
             this.setState({
                 currPage: value
-            },this.changeMovies)
+            }, this.changeMovies)
         }
     }
 
@@ -81,7 +87,7 @@ export class MovieList extends Component {
 
         if (this.state.favourites.includes(movieObj.id)) {
             oldData = oldData.filter((movie) => movie.id != movieObj.id)
-            
+
         }
 
         else {
@@ -91,7 +97,7 @@ export class MovieList extends Component {
         localStorage.setItem('movies-app', JSON.stringify(oldData))
 
         console.log(oldData)
-        
+
         this.handleFavouritesStates()
     }
 
@@ -99,15 +105,15 @@ export class MovieList extends Component {
         let oldData = JSON.parse(localStorage.getItem('movies-app') || '[]')
 
         let temp = oldData.map((movie) => movie.id)
-        
+
         this.setState({
-            favourites:[...temp]
+            favourites: [...temp]
         })
     }
 
     render() {
         console.log('render second')
-        
+
 
         return (
             <>
@@ -126,7 +132,7 @@ export class MovieList extends Component {
 
                                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                                     {
-                                        this.state.hover == movieElem.id && <a  class="btn btn-primary movie-btn" onClick={()=> this.handleFavourites(movieElem)}>{this.state.favourites.includes(movieElem.id) ? 'Remove from Favourites' : 'Add to Favourites'}</a>
+                                        this.state.hover == movieElem.id && <a class="btn btn-primary movie-btn" onClick={() => this.handleFavourites(movieElem)}>{this.state.favourites.includes(movieElem.id) ? 'Remove from Favourites' : 'Add to Favourites'}</a>
                                     }
 
                                 </div>
@@ -141,16 +147,21 @@ export class MovieList extends Component {
 
                     <nav aria-label="Page navigation example">
                         <ul class="pagination">
-                            <li class="page-item"><a class="page-link" onClick={this.handlePrevious}>Previous</a></li>
-
+                            <li class="page-item">
+                                {
+                                    this.state.parr.length != 1 ?
+                                        <a class="page-link" onClick={this.handlePrevious}>Previous</a> :
+                                        <a></a>
+                                }
+                            </li>
                             {
                                 this.state.parr.map((value => (
-                                    <li class="page-item"><a class="page-link" onClick={()=> this.handlePageClick(value)}>{value}</a></li>
+                                    <li class="page-item"><a class="page-link" onClick={() => this.handlePageClick(value)}>{value}</a></li>
                                 )))
                             }
-                            
-                            
-                            <li class="page-item"><a class="page-link" onClick = {this.handleNext}> Next</a></li>
+
+
+                            <li class="page-item"><a class="page-link" onClick={this.handleNext}> Next</a></li>
                         </ul>
                     </nav>
                 </div>
